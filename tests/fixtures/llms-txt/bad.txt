@@ -1,0 +1,10 @@
+Example docs
+# Example
+# Second
+## Docs
+- Quickstart: https://example.com/docs/quickstart
+- [API](/docs/api) - the API
+- [API](/docs/api)
+Some prose here.
+### Deep heading
+## Empty

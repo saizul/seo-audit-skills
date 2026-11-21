@@ -1,0 +1,14 @@
+# Example
+
+> Example is a CLI that syncs files to object storage.
+
+Use the Docs section first. All pages also exist as Markdown at the same URL plus .md.
+
+## Docs
+
+- [Quickstart](https://example.com/docs/quickstart.md): install and first sync in five minutes
+- [API](https://example.com/docs/api.md)
+
+## Optional
+
+- [Blog](https://example.com/blog.md): release notes

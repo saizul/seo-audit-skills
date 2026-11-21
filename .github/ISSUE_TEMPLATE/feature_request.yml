@@ -1,0 +1,28 @@
+name: Improvement
+description: Suggest a new check, option or better instructions for an existing skill
+labels: ["enhancement"]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      placeholder: "schema-markup"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: The rule, flag or instruction you have in mind, with a source if it is an SEO rule.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to implement this

@@ -1,0 +1,51 @@
+name: Bug report
+description: A script crashed, reported a false positive/negative, or a skill gave wrong instructions
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste private URLs, customer data or API keys.** Reduce the input to a minimal example.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - technical-seo-audit
+        - on-page-seo-review
+        - schema-markup
+        - robots-sitemap-check
+        - hreflang-check
+        - core-web-vitals-triage
+        - llms-txt
+        - content-brief
+        - redirect-map
+        - repository / tooling
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: The command you ran and its output (or what the agent did).
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Minimal input
+      description: The smallest HTML / XML / JSON / CSV / robots.txt that reproduces it.
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect? (link the spec or documentation if it is a rule question)
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "v0.1.0, Python 3.12, Claude Code / Codex CLI, macOS"
+    validations:
+      required: true

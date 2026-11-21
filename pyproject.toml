@@ -1,0 +1,32 @@
+# Tooling configuration only. The skills are plain folders; nothing here is installed.
+[project]
+name = "seo-audit-skills"
+version = "0.1.0"
+description = "Agent Skills for technical SEO and content SEO"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Saizul Amin" }]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = [
+    "E501",   # long strings in messages are fine; the formatter handles code
+    "S101",   # assert is how pytest works
+    "S603",   # subprocess with fixed argv in the validator
+    "S310",   # the only urlopen is opt-in (--fetch) and http(s)-only
+    "S314",   # stdlib XML parsing of local files; DOCTYPEs are rejected before parsing
+    "SIM102", "SIM108",
+    "SIM905",  # word lists are written as one string and split, which keeps them compact
+    "UP007", "UP045",  # keep `from __future__ import annotations` style readable on 3.9
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

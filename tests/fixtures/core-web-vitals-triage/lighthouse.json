@@ -1,0 +1,165 @@
+{
+ "lighthouseVersion": "12.6.0",
+ "requestedUrl": "https://example.com/",
+ "finalDisplayedUrl": "https://example.com/",
+ "configSettings": {
+  "formFactor": "mobile"
+ },
+ "categories": {
+  "performance": {
+   "score": 0.42
+  }
+ },
+ "audits": {
+  "largest-contentful-paint": {
+   "id": "largest-contentful-paint",
+   "score": 0.1,
+   "numericValue": 5200.4,
+   "displayValue": "5.2 s"
+  },
+  "cumulative-layout-shift": {
+   "score": 0.5,
+   "numericValue": 0.18,
+   "displayValue": "0.18"
+  },
+  "total-blocking-time": {
+   "score": 0.3,
+   "numericValue": 720,
+   "displayValue": "720 ms"
+  },
+  "first-contentful-paint": {
+   "score": 0.6,
+   "numericValue": 2400,
+   "displayValue": "2.4 s"
+  },
+  "speed-index": {
+   "score": 0.5,
+   "numericValue": 4800
+  },
+  "render-blocking-resources": {
+   "title": "Eliminate render-blocking resources",
+   "score": 0.2,
+   "scoreDisplayMode": "metricSavings",
+   "displayValue": "Potential savings of 1,200 ms",
+   "metricSavings": {
+    "LCP": 1200,
+    "FCP": 1100
+   },
+   "details": {
+    "type": "opportunity",
+    "overallSavingsMs": 1200,
+    "items": [
+     {
+      "url": "https://example.com/css/app.css",
+      "wastedMs": 800
+     }
+    ]
+   }
+  },
+  "unused-javascript": {
+   "title": "Reduce unused JavaScript",
+   "score": 0.4,
+   "scoreDisplayMode": "metricSavings",
+   "metricSavings": {
+    "LCP": 300,
+    "TBT": 250
+   },
+   "details": {
+    "type": "opportunity",
+    "overallSavingsMs": 300,
+    "overallSavingsBytes": 180000,
+    "items": [
+     {
+      "url": "https://cdn.example.net/vendor.js"
+     }
+    ]
+   }
+  },
+  "unsized-images": {
+   "title": "Image elements do not have explicit width and height",
+   "score": 0,
+   "scoreDisplayMode": "metricSavings",
+   "metricSavings": {
+    "CLS": 0.12
+   },
+   "details": {
+    "type": "table",
+    "items": [
+     {
+      "node": {
+       "snippet": "<img src=\"hero.jpg\">"
+      }
+     }
+    ]
+   }
+  },
+  "uses-text-compression": {
+   "title": "Enable text compression",
+   "score": 1,
+   "details": {
+    "type": "opportunity",
+    "overallSavingsMs": 0
+   }
+  },
+  "server-response-time": {
+   "title": "Reduce initial server response time",
+   "score": 0,
+   "scoreDisplayMode": "binary",
+   "details": {
+    "type": "opportunity",
+    "overallSavingsMs": 900
+   }
+  },
+  "font-display": {
+   "title": "Ensure text remains visible during webfont load",
+   "score": 0.5,
+   "scoreDisplayMode": "metricSavings",
+   "metricSavings": {
+    "FCP": 0
+   }
+  },
+  "is-on-https": {
+   "title": "Uses HTTPS",
+   "score": 0,
+   "scoreDisplayMode": "binary"
+  },
+  "largest-contentful-paint-element": {
+   "title": "LCP element",
+   "score": 0,
+   "scoreDisplayMode": "informative",
+   "details": {
+    "type": "list",
+    "items": [
+     {
+      "type": "table",
+      "items": [
+       {
+        "node": {
+         "snippet": "<img class=\"hero\" src=\"hero.jpg\" loading=\"lazy\">"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "lcp-lazy-loaded": {
+   "title": "Largest Contentful Paint image was lazily loaded",
+   "score": 0,
+   "scoreDisplayMode": "metricSavings",
+   "metricSavings": {
+    "LCP": 400
+   },
+   "details": {
+    "type": "table",
+    "items": [
+     {
+      "node": {
+       "snippet": "<img class=\"hero\" loading=\"lazy\">"
+      }
+     }
+    ]
+   }
+  }
+ }
+}

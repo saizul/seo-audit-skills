@@ -1,0 +1,34 @@
+{
+  "name": "seo-audit-skills",
+  "description": "Agent Skills for technical and content SEO: audits, on-page review, schema, robots/sitemaps, hreflang, Core Web Vitals, llms.txt, content briefs and redirect maps.",
+  "owner": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "plugins": [
+    {
+      "name": "seo-audit",
+      "source": "./",
+      "description": "Nine SEO skills with offline, tested helper scripts: technical audit, on-page review, JSON-LD schema, robots.txt and sitemaps, hreflang, Core Web Vitals triage, llms.txt, content briefs and redirect maps.",
+      "category": "marketing",
+      "tags": [
+        "seo",
+        "technical-seo",
+        "schema",
+        "core-web-vitals",
+        "content"
+      ],
+      "skills": [
+        "./skills/content-brief",
+        "./skills/core-web-vitals-triage",
+        "./skills/hreflang-check",
+        "./skills/llms-txt",
+        "./skills/on-page-seo-review",
+        "./skills/redirect-map",
+        "./skills/robots-sitemap-check",
+        "./skills/schema-markup",
+        "./skills/technical-seo-audit"
+      ]
+    }
+  ]
+}

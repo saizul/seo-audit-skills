@@ -1,0 +1,27 @@
+{
+  "name": "seo-audit",
+  "displayName": "SEO Audit Skills",
+  "version": "0.1.0",
+  "description": "Agent Skills for technical SEO and content SEO with offline, tested helper scripts.",
+  "author": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "homepage": "https://github.com/saizul/seo-audit-skills",
+  "repository": "https://github.com/saizul/seo-audit-skills",
+  "license": "MIT",
+  "keywords": [
+    "seo",
+    "technical-seo",
+    "on-page-seo",
+    "schema-markup",
+    "json-ld",
+    "robots-txt",
+    "sitemap",
+    "hreflang",
+    "core-web-vitals",
+    "llms-txt",
+    "content-brief",
+    "redirects"
+  ]
+}

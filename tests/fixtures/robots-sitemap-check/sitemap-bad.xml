@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.com/cart/</loc><lastmod>05/01/2026</lastmod><priority>1.5</priority></url>
+  <url><loc>/relative/page</loc></url>
+  <url><loc>https://other.example.org/page</loc><lastmod>2099-01-01</lastmod></url>
+  <url><loc>https://example.com/dup</loc><changefreq>daily</changefreq></url>
+  <url><loc>https://example.com/dup</loc></url>
+  <url><loc>https://example.com/old-page</loc></url>
+  <url><loc>https://example.com/private/report</loc></url>
+  <url><loc>https://example.com/p?utm_source=x</loc></url>
+  <url></url>
+</urlset>

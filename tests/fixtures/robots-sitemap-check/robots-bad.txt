@@ -1,0 +1,8 @@
+Disallow: /early/
+User-agent: *
+Disallow: /
+Disallow: /wp-includes/
+Noindex: /secret/
+Sitemap: /sitemap.xml
+this line is broken
+Useragent: Foo

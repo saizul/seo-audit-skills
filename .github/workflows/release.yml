@@ -1,0 +1,37 @@
+name: Release assets
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip-skills:
+    name: Attach skill zips
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Validate before packaging
+        run: python tools/validate_skills.py
+      - name: Build zips
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd skills
+          for dir in */; do
+            name="${dir%/}"
+            zip -rq "../dist/${name}.zip" "${name}" -x '*/__pycache__/*' '*.pyc' '*/.DS_Store'
+          done
+          zip -rq ../dist/seo-audit-skills-all.zip . -x '*/__pycache__/*' '*.pyc' '*/.DS_Store'
+          cd ..
+          ls -l dist
+      - name: Upload to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"

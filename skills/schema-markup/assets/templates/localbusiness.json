@@ -1,0 +1,27 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "@id": "https://example.com/#store",
+  "name": "Example Outdoors Downtown",
+  "url": "https://example.com/stores/downtown",
+  "image": "https://example.com/images/store-front.jpg",
+  "telephone": "+1-555-0100",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "100 Main Street",
+    "addressLocality": "Springfield",
+    "addressRegion": "IL",
+    "postalCode": "62701",
+    "addressCountry": "US"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 39.7817, "longitude": -89.6501 },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ]
+}

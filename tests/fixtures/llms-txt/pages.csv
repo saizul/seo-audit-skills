@@ -1,0 +1,4 @@
+url,title,description,section
+https://example.com/docs/install,Install | Example,How to install the CLI,Docs
+https://example.com/docs/[beta],Beta [preview],,Docs
+https://example.com/about,About us,Who we are,

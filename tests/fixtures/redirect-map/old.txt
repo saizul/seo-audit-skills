@@ -1,0 +1,12 @@
+# old site export
+https://old.example.com/
+https://old.example.com/about-us.html
+https://old.example.com/blog/2019/05/how-to-choose-trail-running-shoes/
+https://old.example.com/products/ridgeline-trail-shoe.php
+https://old.example.com/products/Summit-Jacket
+https://old.example.com/blog/category/gear/
+https://old.example.com/contact
+https://old.example.com/old-promo-2018
+https://old.example.com/blog/trail-shoe-review-part-1
+https://old.example.com/blog/trail-shoe-review-part-2
+https://old.example.com/team/index.html

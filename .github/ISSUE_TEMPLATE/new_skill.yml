@@ -1,0 +1,48 @@
+name: New skill proposal
+description: Propose (or offer to build) a new SEO skill
+labels: ["new skill", "good first issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See "Write a new skill" in CONTRIBUTING.md and start from `templates/skill/SKILL.md`.
+  - type: input
+    id: name
+    attributes:
+      label: Skill name
+      description: lowercase-hyphen, max 64 characters
+      placeholder: "image-seo"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What task does it handle, and why do existing skills not cover it?
+    validations:
+      required: true
+  - type: textarea
+    id: triggers
+    attributes:
+      label: Trigger phrases
+      description: What users would type that should activate the skill.
+      placeholder: |
+        - "check our image SEO"
+        - "are our images missing alt text"
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: Deterministic checks (script)
+      description: What a script could check offline, its inputs and outputs.
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Specs or official documentation the rules come from.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to build this skill

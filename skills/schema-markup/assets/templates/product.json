@@ -1,0 +1,24 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Ridgeline Trail Shoe",
+  "description": "Lightweight trail running shoe with 5 mm lugs and a rock plate.",
+  "image": ["https://example.com/images/ridgeline-1x1.jpg"],
+  "sku": "RL-2026-42",
+  "gtin13": "0012345678905",
+  "brand": { "@type": "Brand", "name": "Example Outdoors" },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://example.com/products/ridgeline",
+    "price": "129.00",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "priceValidUntil": "2026-12-31"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.6",
+    "reviewCount": "87"
+  }
+}

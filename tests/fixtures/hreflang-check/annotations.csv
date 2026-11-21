@@ -1,0 +1,5 @@
+url,hreflang,href
+https://example.com/a,en,https://example.com/a
+https://example.com/a,jp,https://example.com/ja/a
+https://example.com/ja/a,ja,https://example.com/ja/a
+https://example.com/ja/a,en,https://example.com/a
