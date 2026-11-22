@@ -97,3 +97,48 @@ def test_norm_path():
     assert rm.norm_path("https://x.com/A/Index.html") == "/a"
     assert rm.norm_path("/about-us.php") == "/about-us"
     assert rm.norm_path("about") == "/about"
+
+
+def test_vercel_output(fixtures, capsys):
+    import json
+
+    d = fixtures / "redirect-map"
+    assert rm.main([str(d / "old.txt"), str(d / "new.csv"), "--format", "vercel"]) == 0
+    doc = json.loads(capsys.readouterr().out)
+    redirects = {r["source"]: r for r in doc["redirects"]}
+    assert redirects["/products/Summit-Jacket"] == {
+        "source": "/products/Summit-Jacket",
+        "destination": "/shop/summit-jacket/",
+        "statusCode": 301,
+    }
+    assert "/contact" not in redirects  # trailing-slash only: left to Vercel
+    assert "/blog/category/gear/" not in redirects  # below --min-confidence
+
+
+def test_vercel_source_escapes_path_to_regexp_syntax():
+    assert rm.vercel_source("/a:b/(x)*") == r"/a\:b/\(x\)\*"
+
+
+def test_cloudflare_bulk_absolute_urls(fixtures, capsys):
+    d = fixtures / "redirect-map"
+    assert rm.main([str(d / "old.txt"), str(d / "new.csv"), "--format", "cloudflare-bulk"]) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert "old.example.com/products/Summit-Jacket,https://www.example.com/shop/summit-jacket/,301" in lines
+    assert not any(line.startswith(("#", "source")) for line in lines)  # no header, no comments
+    assert all(not line.startswith("http") for line in lines)  # source has no scheme
+
+
+def test_cloudflare_bulk_relative_needs_host(tmp_path, capsys):
+    old, new = tmp_path / "old.txt", tmp_path / "new.txt"
+    old.write_text("/about-us.html\n", encoding="utf-8")
+    new.write_text("/about-us/\n", encoding="utf-8")
+    assert rm.main([str(old), str(new), "--format", "cloudflare-bulk"]) == 2
+    assert "--host" in capsys.readouterr().err
+    assert rm.main([str(old), str(new), "--format", "cloudflare-bulk", "--host", "WWW.Example.com"]) == 0
+    assert capsys.readouterr().out == "www.example.com/about-us.html,https://www.example.com/about-us/,301\n"
+
+
+def test_cloudflare_bulk_quotes_commas():
+    rows = [{"old": "/a,b", "new": "/c,d/", "method": "exact", "confidence": 1.0, "review": False, "note": ""}]
+    out = rm.render(rows, "cloudflare-bulk", 0.7, False, "example.com")
+    assert out == '"example.com/a,b","https://example.com/c,d/",301\n'

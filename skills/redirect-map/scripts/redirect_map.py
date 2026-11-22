@@ -4,6 +4,8 @@
   redirect_map.py old-urls.txt new-urls.txt                     # CSV report to stdout
   redirect_map.py old.csv new.csv --format nginx -o redirects.conf
   redirect_map.py old.txt new.txt --format apache --min-confidence 0.8
+  redirect_map.py old.txt new.txt --format vercel -o redirects.json
+  redirect_map.py old.txt new.txt --format cloudflare-bulk --host www.example.com -o bulk.csv
 
 Inputs are text files (one URL or path per line) or CSV files (a 'url'/'address'
 column, otherwise the first column). Matching, in order:
@@ -15,8 +17,10 @@ column, otherwise the first column). Matching, in order:
   none     no candidate: decide manually (410, a hub page, or restore content)
 
 Output formats: csv (report), json, nginx (map block), apache (Redirect 301),
-netlify/cloudflare (_redirects). Server formats include only rows at or above
---min-confidence and never redirect a URL to itself.
+netlify/cloudflare (_redirects), vercel (vercel.json "redirects"), cloudflare-bulk
+(CSV for a Cloudflare Bulk Redirects list; relative URLs need --host). Server
+formats include only rows at or above --min-confidence and never redirect a URL
+to itself.
 
 Exit status: 0 ok, 1 when --fail-on-unmatched and something is unmatched or
 flagged for review, 2 input error. Python 3.9+ standard library only. No network.
@@ -182,7 +186,39 @@ def target_for(url: str, keep_host: bool) -> str:
     return path_of(url) + (f"?{query}" if query else "")
 
 
-def render(rows: list[dict], fmt: str, min_conf: float, absolute_targets: bool) -> str:
+FORMATS = ("csv", "json", "nginx", "apache", "netlify", "vercel", "cloudflare-bulk")
+VERCEL_SPECIAL = re.compile(r"([:()*?+{}\\])")
+
+
+def is_absolute(url: str) -> bool:
+    return bool(re.match(r"^https?://", url, re.I))
+
+
+def vercel_source(path: str) -> str:
+    """Escape path-to-regexp syntax so the source matches literally."""
+    return VERCEL_SPECIAL.sub(r"\\\1", path)
+
+
+def bulk_source(url: str, host: str | None) -> str:
+    """Cloudflare Bulk Redirects source: host + path, no scheme, no query string."""
+    if is_absolute(url):
+        parts = urlsplit(url)
+        return parts.netloc.lower() + (parts.path or "/")
+    if not host:
+        raise ValueError("cloudflare-bulk needs --host for relative old URLs (e.g. --host www.example.com)")
+    return host.lower() + path_of(url)
+
+
+def bulk_target(url: str, host: str | None) -> str:
+    """Cloudflare Bulk Redirects target: always an absolute URL."""
+    if is_absolute(url):
+        return url
+    if not host:
+        raise ValueError("cloudflare-bulk needs --host for relative new URLs (e.g. --host www.example.com)")
+    return f"https://{host.lower()}" + target_for(url, False)
+
+
+def render(rows: list[dict], fmt: str, min_conf: float, absolute_targets: bool, host: str | None = None) -> str:
     if fmt == "json":
         return json.dumps(rows, indent=2)
     if fmt == "csv":
@@ -225,6 +261,28 @@ def render(rows: list[dict], fmt: str, min_conf: float, absolute_targets: bool) 
                 lines.append(f"# skipped (trailing-slash only): {src} -> {dst}")
                 continue
             lines.append(f"{src.replace(' ', '%20')} {dst.replace(' ', '%20')} 301")
+    elif fmt == "vercel":
+        # Vercel strips or adds trailing slashes itself (trailingSlash setting), so a
+        # slash-only rule would loop; leave those to the platform like netlify.
+        redirects = []
+        for r in usable:
+            src, dst = path_of(r["old"]), target_for(r["new"], absolute_targets)
+            if src.rstrip("/") == dst.rstrip("/"):
+                continue
+            redirects.append({"source": vercel_source(src), "destination": dst, "statusCode": 301})
+        return json.dumps({"redirects": redirects}, indent=2) + "\n"
+    elif fmt == "cloudflare-bulk":
+        # No header row and no comments are allowed in the import file.
+        buf = io.StringIO()
+        w = csv.writer(buf, lineterminator="\n")
+        seen = set()
+        for r in usable:
+            src, dst = bulk_source(r["old"], host), bulk_target(r["new"], host)
+            if src in seen or src.rstrip("/") == re.sub(r"^https?://", "", dst, flags=re.I).rstrip("/"):
+                continue
+            seen.add(src)
+            w.writerow([src, dst, 301])
+        return buf.getvalue()
     return "\n".join(lines) + "\n"
 
 
@@ -243,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("old", help="file with old URLs (txt or csv)")
     ap.add_argument("new", help="file with new URLs (txt or csv)")
-    ap.add_argument("--format", choices=("csv", "json", "nginx", "apache", "netlify"), default="csv")
+    ap.add_argument("--format", choices=FORMATS, default="csv")
     ap.add_argument("--threshold", type=float, default=0.55, help="minimum fuzzy similarity 0-1 (default 0.55)")
     ap.add_argument(
         "--review-margin",
@@ -255,6 +313,7 @@ def main(argv: list[str] | None = None) -> int:
         "--min-confidence", type=float, default=0.7, help="lowest confidence written to server formats (default 0.7)"
     )
     ap.add_argument("--absolute-targets", action="store_true", help="keep scheme+host in targets (cross-domain moves)")
+    ap.add_argument("--host", help="host for relative URLs in cloudflare-bulk output (e.g. www.example.com)")
     ap.add_argument("--fail-on-unmatched", action="store_true", help="exit 1 if any row is unmatched or needs review")
     ap.add_argument("-o", "--output", help="write to a file instead of stdout")
     args = ap.parse_args(argv)
@@ -267,7 +326,11 @@ def main(argv: list[str] | None = None) -> int:
         print("error: both URL lists must be non-empty", file=sys.stderr)
         return 2
     rows = build_map(old, new, args.threshold, args.review_margin)
-    out = render(rows, args.format, args.min_confidence, args.absolute_targets)
+    try:
+        out = render(rows, args.format, args.min_confidence, args.absolute_targets, args.host)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     if args.output:
         with open(args.output, "w", encoding="utf-8") as fh:
             fh.write(out)

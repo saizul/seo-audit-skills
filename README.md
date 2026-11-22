@@ -25,7 +25,7 @@ script brings reproducible numbers.
 | [core-web-vitals-triage](skills/core-web-vitals-triage/SKILL.md) | Rate LCP/INP/CLS from Lighthouse, PageSpeed Insights or CrUX JSON and rank fixes by estimated impact | "Here's `lighthouse.json` - what should we fix first?" |
 | [llms-txt](skills/llms-txt/SKILL.md) | Build and validate an llms.txt from a sitemap, page list or HTML build | "Create an llms.txt for our docs" |
 | [content-brief](skills/content-brief/SKILL.md) | Keyword intent and clustering, competitor outline/term/question analysis, gap check and a writer-ready brief | "Write a content brief for 'trail running shoes' from these 3 saved pages" |
-| [redirect-map](skills/redirect-map/SKILL.md) | Old-to-new URL matching (exact, slug, fuzzy, parent) with confidence and review flags; nginx, Apache, Netlify rules | "Map these old URLs to the new site and give me nginx redirects" |
+| [redirect-map](skills/redirect-map/SKILL.md) | Old-to-new URL matching (exact, slug, fuzzy, parent) with confidence and review flags; nginx, Apache, Netlify, Vercel and Cloudflare Bulk Redirects rules | "Map these old URLs to the new site and give me nginx redirects" |
 
 ## Install
 
@@ -163,7 +163,7 @@ Ideas for new skills and features (good first issues are marked):
 - [ ] `ecommerce-seo` - category/product templates, out-of-stock handling, merchant listings
 - [ ] `schema-markup`: Recipe, JobPosting and SoftwareApplication rules (good first issue)
 - [ ] `robots-sitemap-check`: image and video sitemap extensions (good first issue)
-- [ ] `redirect-map`: Vercel and Cloudflare Bulk Redirects output formats (good first issue)
+- [x] `redirect-map`: Vercel and Cloudflare Bulk Redirects output formats
 
 ## Contributing
 
