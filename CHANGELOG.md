@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `redirect-map`: `--format vercel` (a `redirects` array for `vercel.json`, with
+  path-to-regexp characters escaped and slash-only rules skipped) and
+  `--format cloudflare-bulk` (headerless CSV for a Cloudflare Bulk Redirects list, with
+  `--host` for relative URL lists).
+
 ## [0.1.0] - 2026-11-21
 
 ### Added
