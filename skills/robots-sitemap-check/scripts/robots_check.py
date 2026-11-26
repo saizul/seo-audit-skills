@@ -9,6 +9,10 @@ Matching follows Google's documented behaviour: the most specific user-agent gro
 wins (groups with the same agent are merged, '*' is the fallback), the longest
 matching rule wins, and allow wins a tie. '*' and '$' wildcards are supported.
 
+Because a named group replaces the '*' group entirely, the linter warns when a
+crawler-specific group (e.g. Googlebot) silently drops Disallow rules that the
+'*' group has, which is a common reason private paths end up crawled.
+
 Exit status: 0 = no errors and all expectations met, 1 = otherwise, 2 = input error.
 Python 3.9+ standard library only. Reads a local file; no network access.
 """
@@ -71,6 +75,7 @@ class Robots:
     def __init__(self, text: str) -> None:
         self.groups: list[tuple[list[str], list[Rule]]] = []
         self.sitemaps: list[tuple[str, int]] = []
+        self.agent_lines: dict[str, int] = {}
         self.issues: list[dict] = []
         self.size = len(text.encode("utf-8"))
         self._parse(text)
@@ -107,6 +112,7 @@ class Robots:
                         self.groups.append((current_agents, current_rules))
                     current_agents, current_rules = [], []
                 current_agents.append(value.lower())
+                self.agent_lines.setdefault(value.lower(), n)
                 last_was_agent = True
                 continue
             last_was_agent = False
@@ -145,10 +151,35 @@ class Robots:
             ):
                 line = next(r.line for r in rules if r.pattern == "/")
                 self._issue("error", line, "'User-agent: *' + 'Disallow: /' blocks the whole site for every crawler.")
+        self._check_inheritance()
         if not self.groups:
             self._issue("notice", 0, "No user-agent groups: everything is allowed.")
         if not self.sitemaps:
             self._issue("notice", 0, "No Sitemap: line. Add one so crawlers find your XML sitemap.")
+
+    def _check_inheritance(self) -> None:
+        """Warn when a named group drops '*' Disallow rules (named groups do not inherit '*')."""
+        star = [r for agents, rules in self.groups if "*" in agents for r in rules]
+        if not star or any(not r.allow and r.pattern == "/" for r in star):
+            return  # no '*' rules, or '*' blocks everything on purpose (allow-listing bots)
+        star_disallow = [r.pattern for r in star if not r.allow]
+        missing_by_agent: dict[tuple[str, ...], list[str]] = {}
+        for agent in self.agent_lines:
+            if agent == "*":
+                continue
+            own = {r.pattern for agents, rules in self.groups if agent in agents for r in rules if not r.allow}
+            missing = tuple(p for p in dict.fromkeys(star_disallow) if p not in own)
+            if missing:
+                missing_by_agent.setdefault(missing, []).append(agent)
+        for missing, agents in missing_by_agent.items():
+            shown = ", ".join(missing[:3]) + (f" (+{len(missing) - 3} more)" if len(missing) > 3 else "")
+            who = ", ".join(agents)
+            self._issue(
+                "warning",
+                min(self.agent_lines[a] for a in agents),
+                f"Group for '{who}' does not inherit 'User-agent: *' rules, so Disallow {shown} "
+                "do not apply to it; repeat them in that group if they should.",
+            )
 
     def rules_for(self, user_agent: str) -> tuple[str, list[Rule]]:
         token = user_agent.lower().split("/")[0].strip()

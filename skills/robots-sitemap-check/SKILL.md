@@ -40,7 +40,7 @@ Paths below are relative to this skill's directory.
 ## Decision points
 
 - **Blocking vs noindex.** robots.txt controls crawling, not indexing. To remove pages from results, allow crawling and serve `noindex`, or return 404/410. Never block a URL you want de-indexed.
-- **Specific groups replace `*`.** If a `User-agent: Googlebot` group exists, Googlebot ignores the `*` group entirely. Copy shared rules into every specific group.
+- **Specific groups replace `*`.** If a `User-agent: Googlebot` group exists, Googlebot ignores the `*` group entirely. Copy shared rules into every specific group; `robots_check.py` warns when a named group is missing `*` Disallow rules.
 - **Never block rendering resources.** CSS, JS, fonts and API endpoints the page needs must stay crawlable.
 - **AI crawlers.** To opt out of AI training while staying in search, add groups for the relevant tokens (for example `GPTBot`, `Google-Extended`, `CCBot`, `ClaudeBot`) - confirm each vendor's current token in their docs before writing it.
 - **Sitemap contents.** List only canonical, indexable URLs that return 200. Split at 50,000 URLs or 50 MB uncompressed. `<lastmod>` must be the real last significant change; `<priority>` and `<changefreq>` are ignored by Google.

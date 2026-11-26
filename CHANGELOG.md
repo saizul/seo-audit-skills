@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format follows
   path-to-regexp characters escaped and slash-only rules skipped) and
   `--format cloudflare-bulk` (headerless CSV for a Cloudflare Bulk Redirects list, with
   `--host` for relative URL lists).
+- `robots-sitemap-check`: `robots_check.py` warns when a crawler-specific group (for
+  example `User-agent: Googlebot`) does not repeat the `Disallow` rules of the `*` group.
+  Named groups replace `*` entirely, so those paths are crawlable for that bot. Agents
+  missing the same rules share one warning; files where `*` is `Disallow: /` are skipped.
 
 ## [0.1.0] - 2026-11-21
 
