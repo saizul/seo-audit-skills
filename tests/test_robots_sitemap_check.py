@@ -175,3 +175,41 @@ def test_gzip_reader(tmp_path):
 def test_reference_pattern_table(pattern, path, matches):
     r = robots_mod.Robots(f"User-agent: *\nDisallow: {pattern}\n")
     assert (not r.check(path)["allowed"]) is matches
+
+
+def _inherit_issues(text):
+    return [i for i in robots_mod.Robots(text).issues if "does not inherit" in i["message"]]
+
+
+def test_named_group_not_inheriting_star_rules(robots):
+    issues = [i for i in robots.issues if "does not inherit" in i["message"]]
+    assert len(issues) == 1  # googlebot and bingbot miss the same rules: one warning
+    (issue,) = issues
+    assert issue["severity"] == "warning" and issue["line"] == 10
+    assert "'googlebot, bingbot'" in issue["message"]
+    assert "Disallow /cart/, /search, /*.pdf$ (+1 more)" in issue["message"]
+
+
+def test_inheritance_warning_skipped_when_rules_repeated_or_star_blocks_all():
+    repeated = "User-agent: *\nDisallow: /cart/\n\nUser-agent: Googlebot\nDisallow: /cart/\nDisallow: /tmp/\n"
+    assert _inherit_issues(repeated) == []
+    allowlist_bots = "User-agent: *\nDisallow: /\n\nUser-agent: Googlebot\nAllow: /\n"
+    assert _inherit_issues(allowlist_bots) == []
+    no_star = "User-agent: Googlebot\nDisallow: /tmp/\n"
+    assert _inherit_issues(no_star) == []
+
+
+def test_inheritance_warning_per_agent_and_strict(tmp_path, capsys):
+    text = (
+        "User-agent: *\nDisallow: /admin/\nDisallow: /cart/\n\n"
+        "User-agent: Googlebot\nDisallow: /admin/\n\nUser-agent: AdsBot-Google\nAllow: /\n"
+    )
+    issues = _inherit_issues(text)
+    assert [i["line"] for i in issues] == [5, 8]
+    assert "'googlebot'" in issues[0]["message"] and "Disallow /cart/ do not" in issues[0]["message"]
+    assert "'adsbot-google'" in issues[1]["message"] and "/admin/, /cart/" in issues[1]["message"]
+    f = tmp_path / "robots.txt"
+    f.write_text(text + "Sitemap: https://example.com/sitemap.xml\n")
+    assert robots_mod.main([str(f)]) == 0
+    assert robots_mod.main([str(f), "--strict"]) == 1
+    assert "does not inherit" in capsys.readouterr().out

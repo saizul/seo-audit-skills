@@ -50,6 +50,7 @@ all agents). Google ignores `Crawl-delay`, `Host`, `Clean-param`, `Noindex`,
 | Sitemap URL not absolute | error | the protocol requires a full URL |
 | Pattern not starting with `/` or `*` | warning | Google prefixes `/`; usually a mistake |
 | Disallow on .css/.js or asset folders | warning | blocks rendering resources |
+| Named group drops `*` Disallow rules | warning | a `Googlebot` (or any named) group replaces `*`, so those paths become crawlable for it; skipped when `*` is `Disallow: /` (bot allow-listing) |
 | Misspelt `useragent` / `disalow` | warning | tolerated by Google, not by every crawler |
 | Unknown directive | warning | probably a typo |
 | Directive ignored by Google | notice | it has no effect on Google |
