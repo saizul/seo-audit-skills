@@ -14,6 +14,7 @@ keyword are not directly comparable.
 | `canonical` | 6 | one absolute canonical (self when `--url` given) | relative, or points elsewhere | missing or conflicting |
 | `word-count` | 6 | >= 300 words of body text | 150-299 | < 150 |
 | `internal-links` | 6 | >= 3 | 1-2 | 0 |
+| `mixed-content` | 4 | no `http://` subresources (only checked when the page URL or canonical is https) | `http://` images, `srcset`, video posters, audio/track | `http://` scripts, stylesheets, iframes, objects |
 | `heading-outline` | 4 | H2s present, no skipped levels | skipped levels, empty headings, no H2 | - |
 | `image-alt` | 4 | every `<img>` has an alt attribute | some missing, or no images | more than half missing |
 | `viewport` | 3 | viewport meta | - | missing |

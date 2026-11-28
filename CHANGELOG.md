@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `on-page-seo-review`: `onpage_review.py` adds a `mixed-content` check (weight 4) for
+  https pages: `fail` for http:// scripts, stylesheets, iframes and objects that browsers
+  block, `warn` for http:// images, `srcset` candidates and media. Skipped when the page
+  URL (from `--url` or the canonical) is not https.
 - `redirect-map`: `--format vercel` (a `redirects` array for `vercel.json`, with
   path-to-regexp characters escaped and slash-only rules skipped) and
   `--format cloudflare-bulk` (headerless CSV for a Cloudflare Bulk Redirects list, with

@@ -1,6 +1,6 @@
 ---
 name: on-page-seo-review
-description: Score the on-page SEO of a single page (0-100) - title, meta description, H1 and heading outline, canonical, robots, image alt text, internal and anchor links, word count, Open Graph, structured data and target-keyword placement - and rewrite the weak elements. Works on an HTML file, a template's rendered output, or a URL when fetching is allowed. Use when the user asks to review, optimise or "SEO check" a page, post, landing page or template, or asks for better titles and meta descriptions.
+description: Score the on-page SEO of a single page (0-100) - title, meta description, H1 and heading outline, canonical, robots, image alt text, internal and anchor links, word count, Open Graph, structured data, mixed content on https pages and target-keyword placement - and rewrite the weak elements. Works on an HTML file, a template's rendered output, or a URL when fetching is allowed. Use when the user asks to review, optimise or "SEO check" a page, post, landing page or template, or asks for better titles and meta descriptions.
 license: MIT
 ---
 
@@ -42,7 +42,7 @@ Paths below are relative to this skill's directory.
    - Is the title compelling, not just keyword-correct? Is the H1 specific?
    - Is the main content unique, current and demonstrably expert (author, sources, first-hand detail)?
    - Are internal links pointing to the most relevant pages, with descriptive anchors?
-4. **Write fixes** in priority order: indexability, title, H1, meta description, content gaps, internal links, images, social and schema.
+4. **Write fixes** in priority order: indexability, blocked mixed content (`mixed-content` fail: http:// scripts or styles that browsers refuse on https), title, H1, meta description, content gaps, internal links, images, social and schema.
 5. **When editing code**, change the template or component that produces the element (layout `<head>`, CMS field, frontmatter), not just one rendered file. Re-run the script on the rebuilt output to confirm the score moved.
 
 ## Writing rules
