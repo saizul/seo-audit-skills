@@ -73,3 +73,39 @@ def test_stdin(monkeypatch, capsys):
 def test_title_length(title, status):
     res = onpage.review(f"<html><head><title>{title}</title></head><body></body></html>")
     assert next(c for c in res["checks"] if c["id"] == "title")["status"] == status
+
+
+def _page(body, canonical="https://example.com/p"):
+    return f'<html><head><title>T</title><link rel="canonical" href="{canonical}"></head><body>{body}</body></html>'
+
+
+def test_mixed_content_active_fails():
+    html = _page(
+        '<script src="http://cdn.example.net/app.js"></script>'
+        '<link rel="stylesheet" href="http://cdn.example.net/site.css">'
+        '<img src="http://img.example.net/a.jpg" alt="a">'
+    )
+    c = check(onpage.review(html), "mixed-content")
+    assert c["status"] == "fail"
+    assert "2 script/style/frame" in c["message"] and "app.js" in c["message"]
+
+
+def test_mixed_content_passive_warns_and_srcset():
+    html = _page(
+        '<img src="https://img.example.net/a.jpg" srcset="http://img.example.net/a-2x.jpg 2x, /a-3x.jpg 3x" alt="a">'
+        '<video poster="http://img.example.net/p.jpg"></video><a href="http://other.example.org/">ok</a>'
+    )
+    c = check(onpage.review(html), "mixed-content")
+    assert c["status"] == "warn"
+    assert "2 image/media" in c["message"]
+
+
+def test_mixed_content_pass_and_skipped_without_https():
+    clean = _page('<script src="/app.js"></script><img src="//cdn.example.net/a.jpg" alt="a">')
+    assert check(onpage.review(clean), "mixed-content")["status"] == "pass"
+    http_page = _page('<script src="http://cdn.example.net/app.js"></script>', canonical="http://example.com/p")
+    assert not any(c["id"] == "mixed-content" for c in onpage.review(http_page)["checks"])
+    no_url = '<html><body><script src="http://x.example/a.js"></script></body></html>'
+    assert not any(c["id"] == "mixed-content" for c in onpage.review(no_url)["checks"])
+    via_flag = onpage.review(no_url, url="https://example.com/p")
+    assert check(via_flag, "mixed-content")["status"] == "fail"

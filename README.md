@@ -18,7 +18,7 @@ script brings reproducible numbers.
 | Skill | What it does | Try asking |
 | --- | --- | --- |
 | [technical-seo-audit](skills/technical-seo-audit/SKILL.md) | Crawlability, indexability, canonicals, status codes, redirect chains/loops, broken internal links, orphans and click depth from a build folder or crawl CSV | "Run a technical SEO audit on `dist/` for https://example.com" |
-| [on-page-seo-review](skills/on-page-seo-review/SKILL.md) | 0-100 score for title, meta, H1/outline, canonical, alt text, links, word count, OG, schema and keyword placement, plus rewrites | "Review the SEO of `public/pricing/index.html` for 'invoice software'" |
+| [on-page-seo-review](skills/on-page-seo-review/SKILL.md) | 0-100 score for title, meta, H1/outline, canonical, alt text, links, word count, OG, schema, mixed content and keyword placement, plus rewrites | "Review the SEO of `public/pricing/index.html` for 'invoice software'" |
 | [schema-markup](skills/schema-markup/SKILL.md) | Generate JSON-LD (Article, Product, FAQPage, LocalBusiness, Organization, Person, BreadcrumbList, Event, VideoObject) and validate required/recommended properties | "Add Product schema to our product template and validate it" |
 | [robots-sitemap-check](skills/robots-sitemap-check/SKILL.md) | Lint robots.txt (including named groups that drop `*` rules), test URLs with Google's longest-match rules, validate sitemaps and sitemap indexes, cross-check blocked URLs | "Is /checkout/ blocked for Googlebot? Check our sitemap too" |
 | [hreflang-check](skills/hreflang-check/SKILL.md) | Validate language/region codes, return links, self-references, x-default and canonical conflicts from HTML, sitemap or CSV | "Audit hreflang on the built site in `out/`" |

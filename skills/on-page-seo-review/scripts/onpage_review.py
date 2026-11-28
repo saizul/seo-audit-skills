@@ -6,8 +6,9 @@
   onpage_review.py https://example.com/page --fetch      # network is opt-in
 
 Checks title, meta description, H1 and heading outline, canonical, robots, lang,
-viewport, image alt text, internal/external links, word count, Open Graph and
-structured data, plus keyword placement when --keyword is given.
+viewport, image alt text, internal/external links, word count, Open Graph,
+structured data and mixed content (http:// scripts, styles, frames and media on an
+https page), plus keyword placement when --keyword is given.
 
 Exit status: 0 = score >= --min-score, 1 = below, 2 = usage or input error.
 Python 3.9+ standard library only.
@@ -27,6 +28,10 @@ TITLE_MIN, TITLE_MAX = 30, 60
 DESC_MIN, DESC_MAX = 70, 160
 MIN_WORDS = 300
 SKIP_TEXT = {"script", "style", "noscript", "template", "svg"}
+# Subresources a browser loads; active ones are blocked as mixed content, passive ones
+# are auto-upgraded or flagged "Not secure".
+ACTIVE_TAGS = {"script", "iframe", "frame", "object", "embed"}
+PASSIVE_TAGS = {"img", "source", "video", "audio", "track"}
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 
 
@@ -45,6 +50,7 @@ class OnPageParser(HTMLParser):
         self.images: list[dict] = []
         self.links: list[dict] = []
         self.jsonld_blocks = 0
+        self.resources: list[tuple[str, str]] = []  # (kind, absolute or relative URL)
         self.text_parts: list[str] = []
         self._stack: list[str] = []
         self._capture: str | None = None
@@ -76,6 +82,7 @@ class OnPageParser(HTMLParser):
             self.images.append({"src": a.get("src", ""), "alt": a.get("alt"), "has_alt": "alt" in a})
         elif tag == "script" and a.get("type", "").lower() == "application/ld+json":
             self.jsonld_blocks += 1
+        self._collect_resources(tag, a)
         if tag in ("title", "h1", "h2", "h3", "h4", "h5", "h6"):
             self._capture = tag
             self._buf = []
@@ -83,6 +90,23 @@ class OnPageParser(HTMLParser):
             self._link = {"href": a.get("href", "").strip(), "rel": a.get("rel", "").lower(), "text": []}
         if tag not in VOID:
             self._stack.append(tag)
+
+    def _collect_resources(self, tag: str, a: dict) -> None:
+        rel = a.get("rel", "").lower().split()
+        if tag in ACTIVE_TAGS:
+            src = a.get("src") or a.get("data") or ""
+            if src:
+                self.resources.append(("active", src.strip()))
+        elif tag == "link" and ("stylesheet" in rel or "modulepreload" in rel):
+            self.resources.append(("active", a.get("href", "").strip()))
+        elif tag in PASSIVE_TAGS:
+            for key in ("src", "poster"):
+                if a.get(key):
+                    self.resources.append(("passive", a[key].strip()))
+            for candidate in a.get("srcset", "").split(","):
+                first = candidate.strip().split(" ")[0]
+                if first:
+                    self.resources.append(("passive", first))
 
     def handle_startendtag(self, tag: str, attrs: list) -> None:
         self.handle_starttag(tag, attrs)
@@ -280,6 +304,32 @@ def review(html: str, url: str = "", keyword: str = "") -> dict:
             r.add("canonical", 6, "pass", f"Canonical {c}.")
         if not page_url and urlsplit(c).scheme:
             page_url = c
+
+    # Mixed content (only when the page is known to be https)
+    if urlsplit(page_url).scheme == "https":
+        insecure = {"active": [], "passive": []}
+        for kind, src in p.resources:
+            if src.lower().startswith("http://") and src not in insecure[kind]:
+                insecure[kind].append(src)
+        if insecure["active"]:
+            r.add(
+                "mixed-content",
+                4,
+                "fail",
+                f"{len(insecure['active'])} script/style/frame URL(s) over http:// are blocked on https: "
+                f"{insecure['active'][:3]}.",
+                "Serve them over https:// (or a relative URL); blocked scripts and styles break the page.",
+            )
+        elif insecure["passive"]:
+            r.add(
+                "mixed-content",
+                4,
+                "warn",
+                f"{len(insecure['passive'])} image/media URL(s) over http://: {insecure['passive'][:3]}.",
+                "Change them to https://; browsers upgrade or flag them and the page loses its secure padlock.",
+            )
+        else:
+            r.add("mixed-content", 4, "pass", "No http:// subresources on this https page.")
 
     # Robots
     robots = ",".join(p.robots)
